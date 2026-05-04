@@ -57,7 +57,7 @@ def generate_ics_content(collections):
 @st.cache_data
 def load_data():
     # Make sure this matches the exact filename you uploaded!
-    return pd.read_excel('Kerbside_Address_Search_Final2 (1).xlsx', sheet_name='All Kerb')
+    return pd.read_excel('Kerbside_Address_Search_Final2.xlsx', sheet_name='All Kerb')
 
 # This is your "config.php". For now, we just have EQ_67, but you can add more later.
 AREA_CONFIG = {

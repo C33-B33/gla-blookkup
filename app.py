@@ -67,6 +67,17 @@ AREA_CONFIG = {
     }
 }
 
+# Dictionary mapping bin types to emojis and hex colors
+BIN_STYLES = {
+    "Blue Bin (Paper/Card)": {"icon": "🟦", "color": "#007BFF"},     # Council Blue
+    "Grey Bin (Plastics/Cans)": {"icon": "🩶", "color": "#6C757D"},  # Slate Grey
+    "Green Bin (General Waste)": {"icon": "🟩", "color": "#28A745"}, # Emerald Green
+    "Brown Bin (Food/Garden)": {"icon": "🟫", "color": "#8B4513"},   # Earth Brown
+    "Purple Bin (Glass)": {"icon": "🟪", "color": "#6F42C1"}         # Deep Purple
+}
+
+
+
 # ==========================================
 # 3. STATE MANAGEMENT (The "Cookie")
 # ==========================================
@@ -106,14 +117,45 @@ if st.session_state['cal_code']:
         collections.sort(key=lambda x: x[1])
         
         st.subheader("Upcoming Collections")
+        
         for name, date, freq in collections:
             days_away = (date - datetime.now().date()).days
+            
+            # Grab the specific color and icon for this bin
+            style = BIN_STYLES.get(name, {"icon": "🗑️", "color": "#333333"})
+            
+            # Format the "Days Away" text dynamically
             if days_away == 0:
-                st.error(f"🚨 **{name} is TODAY!**")
+                time_text = "🚨 **TODAY!** Put it out now!"
+                bg_color = "#ffeeba" # Slight yellow highlight for today
             elif days_away == 1:
-                st.warning(f"⏰ **{name}** is tomorrow ({date.strftime('%A, %d %b')})")
+                time_text = f"⏰ Tomorrow ({date.strftime('%d %b')})"
+                bg_color = "#f8f9fa"
             else:
-                st.info(f"📅 **{name}**: {date.strftime('%A, %d %b')} ({days_away} days away)")
+                time_text = f"📅 {date.strftime('%A, %d %b')} ({days_away} days away)"
+                bg_color = "#ffffff"
+
+            # Inject custom HTML/CSS to create a beautiful "Card"
+            st.markdown(
+                f"""
+                <div style="
+                    padding: 15px; 
+                    border-left: 8px solid {style['color']}; 
+                    background-color: {bg_color}; 
+                    border-radius: 8px; 
+                    margin-bottom: 12px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                ">
+                    <h4 style="margin: 0; color: #31333F;">
+                        {style['icon']} <span style="color: {style['color']};">{name}</span>
+                    </h4>
+                    <p style="margin: 5px 0 0 0; font-size: 16px; color: #555;">
+                        {time_text}
+                    </p>
+                </div>
+                """, 
+                unsafe_allow_html=True # This tells Streamlit it's okay to render your HTML
+            )
                 
         st.divider()
         

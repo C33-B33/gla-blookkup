@@ -1,30 +1,34 @@
 import streamlit as st
 import pandas as pd
 
+# Load the data from your uploaded Excel file
+@st.cache_data
+def load_data():
+    # We use the 'All Kerb' sheet from your file
+    df = pd.read_csv('Kerbside_Address_Search_Final2 (1).xlsx - All Kerb.csv')
+    return df
+
+df = load_data()
+
 st.title("Glasgow Bin Finder 🚛")
 
-# 1. THE PORTAL: Upload the Excel file
-uploaded_file = st.file_uploader("Admin: Upload Kerbside Excel", type="xlsx")
+# Address Selector Logic
+postcode_input = st.text_input("Enter Postcode", value="G404EA").upper().strip()
 
-if uploaded_file:
-    # Read the data (like fetching from a DB)
-    df = pd.read_excel(uploaded_file, sheet_name="All Kerb")
+if postcode_input:
+    # Filter the Excel data for that postcode
+    filtered_df = df[df['Postcode1'] == postcode_input.replace(" ", "")]
     
-    # 2. ADDRESS SELECTOR: Postcode search
-    postcode = st.text_input("Enter Postcode (e.g., G404EA)").upper().replace(" ", "")
-    
-    if postcode:
-        # Filter data (The 'SELECT * FROM df WHERE...' equivalent)
-        results = df[df['Postcode1'] == postcode]
+    if not filtered_df.empty:
+        address = st.selectbox("Select your address", filtered_df['Address 1'])
         
-        if not results.empty:
-            address = st.selectbox("Select your address", results['Address 1'])
-            
-            # 3. DASHBOARD: Show the info
-            st.success(f"Selected: {address}")
-            cal_code = results.iloc[0]['Calendar Code']
-            st.write(f"Your Bin Group is: **{cal_code}**")
-            
-            # Link to the PDF you found earlier
-            url = results.iloc[0]['Calendar URL']
-            st.link_button("View Official PDF", url)
+        # Grab the specific row for the selected address
+        user_row = filtered_df[filtered_df['Address 1'] == address].iloc[0]
+        cal_code = user_row['Calendar Code']
+        
+        st.info(f"Your Address uses Calendar Code: **{cal_code}**")
+        
+        # Link to the official PDF found in your Excel
+        st.link_button("Open Official PDF Schedule", user_row['Calendar URL'])
+    else:
+        st.error("Postcode not found in the local database.")

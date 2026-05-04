@@ -27,7 +27,7 @@ def generate_ics_content(collections):
     ics = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
-        "PRODID:-//Glasgow Bin App//EN",
+        "PRODID:-//Glasgow Bin Schedule Finder//EN",
         "CALSCALE:GREGORIAN",
         "METHOD:PUBLISH"
     ]

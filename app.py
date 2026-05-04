@@ -182,7 +182,7 @@ else:
     
     try:
         df = load_data()
-        postcode_input = st.text_input("Enter Postcode (e.g., G404EA)").upper().replace(" ", "")
+        postcode_input = st.text_input("Enter Postcode (e.g., G2 1DU)").upper().replace(" ", "")
         
         if postcode_input:
             results = df[df['Postcode1'] == postcode_input]
